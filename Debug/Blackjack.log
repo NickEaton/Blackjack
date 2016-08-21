@@ -1,0 +1,6 @@
+﻿  Main.cpp
+  Card.cpp
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\card.cpp(78): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  AI.cpp
+  Generating Code...
+  Blackjack.vcxproj -> C:\Users\nicke\documents\visual studio 2015\Projects\Blackjack\Debug\Blackjack.exe
