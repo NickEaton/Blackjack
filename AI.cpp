@@ -10,7 +10,7 @@ AI::AI() {
 }
 
 bool AI::hit() {
-	return h.getValue() <= 17 && h.index < 5 ? true : false;
+	return h.getValue() < 17 ? true : false;
 }
 
 bool AI::bust() {

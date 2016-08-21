@@ -6,14 +6,24 @@
 #include "AI.h"
 #include <iostream>
 #include <string>
+#include <conio.h>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
 int main() {
+
+	HOME:
+
 	Player player;
 	AI nick;
 	AI salem;
 	AI noah;
+
+	int playerScore = 0;
+	int noahScore = 0;
+	int salemScore = 0;
 
 	sf::RenderWindow title(sf::VideoMode(200, 100), "Blackjack");
 	while (title.isOpen()) {
@@ -87,11 +97,24 @@ int main() {
 	while (true) {
 		sf::RenderWindow window(sf::VideoMode(770, 400), "Blackjack");
 
+	LOOP:
+
+		bool playWin = false;
+		bool noahWin = false;
+		bool salemWin = false;
+		bool houseWin = false;
+
 		Deck deck = Deck();
 
 		player = Player(deck.draw(), deck.draw());
 		noah = AI(deck.draw(), deck.draw());
 		salem = AI(deck.draw(), deck.draw());
+
+		sf::Texture bg;
+		bg.loadFromFile("Background.jpg");
+		sf::Sprite background;
+		background.setTexture(bg);
+		background.setPosition(sf::Vector2f(0, 0));
 
 		sf::Texture c1;
 		c1.loadFromFile(player.h.hand[0].getFileName());
@@ -115,7 +138,7 @@ int main() {
 
 		sf::Font font;
 		font.loadFromFile("AdobeGothicStd-Bold.otf");
-
+		
 		sf::Text hit;
 		hit.setFont(font);
 		hit.setString("Hit");
@@ -129,6 +152,78 @@ int main() {
 		stay.setCharacterSize(24);
 		stay.setFillColor(sf::Color::Black);
 		stay.setPosition(sf::Vector2f(55, 335));
+
+		sf::Text plWin;
+		plWin.setFont(font);
+		plWin.setString("Player wins, new game...");
+		plWin.setCharacterSize(18);
+		plWin.setFillColor(sf::Color::Black);
+		plWin.setPosition(sf::Vector2f(500, 310));
+
+		sf::Text nwWin;
+		nwWin.setFont(font);
+		nwWin.setString("Noah wins, new game...");
+		nwWin.setCharacterSize(18);
+		nwWin.setFillColor(sf::Color::Black);
+		nwWin.setPosition(sf::Vector2f(500, 310));
+
+		sf::Text svWin;
+		svWin.setFont(font);
+		svWin.setString("Salem wins, new game...");
+		svWin.setCharacterSize(18);
+		svWin.setFillColor(sf::Color::Black);
+		svWin.setPosition(sf::Vector2f(500, 310));
+
+		sf::Text hsWin;
+		hsWin.setFont(font);
+		hsWin.setString("House wins, new game...");
+		hsWin.setCharacterSize(18);
+		hsWin.setFillColor(sf::Color::Black);
+		hsWin.setPosition(sf::Vector2f(500, 310));
+
+		font.loadFromFile("impact.ttf");
+
+		std::string plString{ "Player's Score: " };
+		plString.append(std::to_string(playerScore));
+		sf::Text plScore;
+		plScore.setFont(font);
+		plScore.setCharacterSize(18);
+		plScore.setString(plString);
+		plScore.setFillColor(sf::Color::Color(128, 128, 128));
+		plScore.setPosition(sf::Vector2f(15, 15));
+
+		std::string nwString{ "Noah's Score: " };
+		nwString.append(std::to_string(noahScore));
+		sf::Text nwScore;
+		nwScore.setFont(font);
+		nwScore.setCharacterSize(18);
+		nwScore.setString(nwString);
+		nwScore.setFillColor(sf::Color::Color(128, 128, 128));
+		nwScore.setPosition(sf::Vector2f(165, 15));
+
+		std::string svString{ "Salem's Score: " };
+		svString.append(std::to_string(salemScore));
+		sf::Text svScore;
+		svScore.setFont(font);
+		svScore.setCharacterSize(18);
+		svScore.setString(svString);
+		svScore.setFillColor(sf::Color::Color(128, 128, 128));
+		svScore.setPosition(sf::Vector2f(315, 15));
+
+		sf::RectangleShape homeButton(sf::Vector2f(135, 30));
+		homeButton.setFillColor(sf::Color::Color(255, 51, 51));
+		homeButton.setOutlineColor(sf::Color::Black);
+		homeButton.setOutlineThickness(1);
+		homeButton.setPosition(sf::Vector2f(615, 15));
+
+		font.loadFromFile("AdobeGothicStd-Bold.otf");
+
+		sf::Text home;
+		home.setFont(font);
+		home.setFillColor(sf::Color::Black);
+		home.setString("Home");
+		home.setCharacterSize(16);
+		home.setPosition(sf::Vector2f(657, 20));
 
 		sf::RectangleShape stayButton(sf::Vector2f(135, 50));
 		stayButton.setFillColor(sf::Color::Color(51, 51, 255));
@@ -159,6 +254,13 @@ int main() {
 		specBox.setOutlineColor(sf::Color::Black);
 		specBox.setOutlineThickness(1);
 		specBox.setPosition(sf::Vector2f(165, 265));
+
+		bool gameEnd = false;
+		sf::RectangleShape specBox2(sf::Vector2f(280, 110));
+		specBox2.setFillColor(sf::Color::Color(255, 128, 0));
+		specBox2.setOutlineColor(sf::Color::Black);
+		specBox2.setOutlineThickness(1);
+		specBox2.setPosition(sf::Vector2f(465, 265));
 
 		bool blj = false;
 		sf::Text blackjack;
@@ -193,17 +295,23 @@ int main() {
 		card5.scale(.275, .275);
 
 		int plindex = 1;
+		int blackj = 0;
 		while (window.isOpen()) {
 			sf::Event event;
 
-			if (player.h.getValue() == 21) {
+			if (player.h.getValue() == 21 && blackj == 0) {
 				cout << "[INFO]Player Blackjacked" << endl;
 				blj = true;
+				blackj++;
 			}
 
 			while (window.pollEvent(event)) {
 				if (event.type == sf::Event::Closed)
 					return 0;
+				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.x >= 615 && event.mouseButton.x <= 750 && event.mouseButton.y >= 15 && event.mouseButton.y <= 45) {
+					cout << "[INFO]Home Button Clicked";
+					goto HOME;
+				}
 				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.x >= 15 && event.mouseButton.x <= 150 && event.mouseButton.y >= 265 && event.mouseButton.y <= 315) {
 					cout << "[INFO]Hit Button Clicked" << endl;
 					player.hit(deck.draw());
@@ -234,6 +342,10 @@ int main() {
 				}
 				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.x >= 15 && event.mouseButton.x <= 150 && event.mouseButton.y >= 325 && event.mouseButton.y <= 375) {
 					cout << "[INFO]Stay Button Clicked" << endl;
+
+					GAME_END:
+
+					gameEnd = true;
 					while (noah.hit() && !noah.bust()) {
 						noah.addCard(deck.draw());
 					}
@@ -243,19 +355,40 @@ int main() {
 					int pv = player.h.getValue();
 					int nv = noah.h.getValue();
 					int sv = salem.h.getValue();
-					if (pv > nv && pv > sv) {
-						//player wins
+					if (pv > 21)
+						pv = 0;
+					if (nv > 21)
+						nv = 0;
+					if (sv > 21)
+						sv = 0;
+					cout << "[INFO]PV=" << pv << " NV=" << nv << " SV=" << sv << endl;
+					if (pv > nv && pv > sv && player.h.getValue() <= 21) {
+						cout << "[INFO]Player wins" << endl;
+						playWin = true;
+						playerScore++;
+						goto LN;
 					}
-					else if (nv > pv && nv > sv) {
-						//noah wins
+					if (nv > pv && nv > sv && noah.h.getValue() <= 21) {
+						cout << "[INFO]Noah wins" << endl;
+						noahWin = true;
+						noahScore++;
+						goto LN;
 					}
-					else if (sv > pv && sv > nv) {
-						//salem wins
+					if (sv > pv && sv > nv && salem.h.getValue() <= 21) {
+						cout << "[INFO]Salem wins" << endl;
+						salemWin = true;
+						salemScore++;
+						goto LN;
 					}
+					cout << "[INFO]House wins" << endl;
+					houseWin = true;
 				}
 			}
 
+			LN:
+
 			window.clear(sf::Color::Color(192, 192, 192));
+			window.draw(background);
 			window.draw(card1);
 			window.draw(card2);
 			//if (plindex > 1)
@@ -268,12 +401,31 @@ int main() {
 			window.draw(stayButton);
 			window.draw(hit);
 			window.draw(stay);
+			window.draw(plScore);
+			window.draw(nwScore);
+			window.draw(svScore);
+			window.draw(homeButton);
+			window.draw(home);
 			if (blj || bst) 
 				window.draw(specBox);
-			if (blj)
+			if (blj) {
 				window.draw(blackjack);
-			if (bst) 
+			}
+			if (bst) {
 				window.draw(bust);
+			}
+			if (gameEnd) {
+				window.draw(specBox2);
+			}
+			if (playWin)
+				window.draw(plWin);
+			if (noahWin)
+				window.draw(nwWin);
+			if (salemWin)
+				window.draw(svWin);
+			if (houseWin)
+				window.draw(hsWin);
+			
 			/* if (plindex <= 1)
 				window.draw(ca3);
 			if (plindex <= 2)
@@ -281,6 +433,14 @@ int main() {
 			if (plindex <= 3)
 				window.draw(ca5); */
 			window.display();
+			if (gameEnd) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+				goto LOOP;
+			}
+			if (bst || blj) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+				goto GAME_END;
+			}
 		}
 	}
 
