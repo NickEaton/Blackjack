@@ -1,20 +1,38 @@
+/*Blackjack Simulator
+Author ~ Nick
+Date ~ 8/27/16
+Description ~ A program to simulate a virtual game of blackjack.
+The user can choose to either play the game themselves, or to
+spectate 2 AI's playing each other
+*/
+
+//SFML for all visual aspects
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+//Vector for storage
 #include <vector>
+//Includes the Card, Deck and Hand classes
 #include "Card.h"
+//Includes the AI and Player classes
 #include "AI.h"
+//Log info to the console through cout
 #include <iostream>
+//std::string
 #include <string>
+//sleep
 #include <conio.h>
+//milliseconds for sleep functions
 #include <chrono>
+//accesses thread sleep functions
 #include <thread>
 
 using namespace std;
 
+//one method to rule them all
 int main() {
 
-	//Home goto
+	//Home goto identifier
 	HOME:
 
 	//AI declarations
@@ -30,6 +48,8 @@ int main() {
 
 	//Title window, choose play or spectate
 	sf::RenderWindow title(sf::VideoMode(200, 100), "Blackjack");
+
+	//Main title loop
 	while (title.isOpen()) {
 
 		//Title box rectange
@@ -126,6 +146,7 @@ int main() {
 		//Generate the window
 		sf::RenderWindow window(sf::VideoMode(770, 400), "Blackjack");
 
+	//Main play loop goto identifier
 	LOOP:
 
 		//Local win tracker vars
@@ -361,6 +382,7 @@ int main() {
 		//counter vars
 		int plindex = 1;
 		int blackj = 0;
+
 		while (window.isOpen()) {
 
 			//Local event list
@@ -391,30 +413,40 @@ int main() {
 					cout << "[INFO]Hit Button Clicked" << endl;
 					player.hit(deck.draw());
 
-					//Load cards when/if applicable
+					//Load player card 3
 					if (plindex == 1) {
 						cout << "[INFO]Loaded Card 3" << endl;
 						car3.loadFromFile(player.h.hand[2].getFileName());
 						card3.setTexture(car3);
 					}
+
+					//Load player card 4
 					else if (plindex == 2) {
 						cout << "[INFO]Loaded Card 4" << endl;
 						car4.loadFromFile(player.h.hand[3].getFileName());
 						card4.setTexture(car4);
 					}
+
+					//Load player card 5
 					else if (plindex == 3) {
 						cout << "[INFO]Loaded Card 5" << endl;
 						car5.loadFromFile(player.h.hand[4].getFileName());
 						card5.setTexture(car5);
 					}
+
+					//Check for a blackjack
 					if (player.h.getValue() == 21) {
 						cout << "[INFO]Player Blackjacked" << endl;
 						blj = true;
 					}
+
+					//Check for a bust
 					if (player.h.getValue() > 21) {
 						cout << "[INFO]Player Busted" << endl;
 						bst = true;
 					}
+
+					//Incr. player counter
 					++plindex;
 				}
 
@@ -422,22 +454,35 @@ int main() {
 				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.x >= 15 && event.mouseButton.x <= 150 && event.mouseButton.y >= 325 && event.mouseButton.y <= 375) {
 					cout << "[INFO]Stay Button Clicked" << endl;
 
+					//Game ended goto identifier
 					GAME_END:
 
 					gameEnd = true;
+
+					//Calculate noah's moves
 					while (noah.hit() && !noah.bust()) {
 						noah.addCard(deck.draw());
 					}
+
+					//Calculate salem's moves
 					while (salem.hit() && !salem.bust()) {
 						salem.addCard(deck.draw());
 					}
+
+					//Local final values to compare
 					int pv = player.h.getValue();
 					int nv = noah.h.getValue();
 					int sv = salem.h.getValue();
+
+					//Player busted, value gets thrown out
 					if (pv > 21)
 						pv = 0;
+
+					//Noah busted, value gets thrown out
 					if (nv > 21)
 						nv = 0;
+
+					//Salem busted, value gets thrown out
 					if (sv > 21)
 						sv = 0;
 					cout << "[INFO]PV=" << pv << " NV=" << nv << " SV=" << sv << endl;
@@ -464,6 +509,7 @@ int main() {
 				}
 			}
 
+			//Redraw identifier
 			LN:
 
 			//Clear the window and draw all the elements
@@ -486,17 +532,27 @@ int main() {
 			window.draw(svScore);
 			window.draw(homeButton);
 			window.draw(home);
+
+			//If blackjack or bust, drawthe spec box
 			if (blj || bst) 
 				window.draw(specBox);
+
+			//Draw the blackjack text if blj
 			if (blj) {
 				window.draw(blackjack);
 			}
+
+			//Draw the bust text if bst
 			if (bst) {
 				window.draw(bust);
 			}
+
+			//If the game is over, draw the winner box
 			if (gameEnd) {
 				window.draw(specBox2);
 			}
+
+			//Draw the winner's text
 			if (playWin)
 				window.draw(plWin);
 			if (noahWin)
@@ -514,11 +570,13 @@ int main() {
 				window.draw(ca5); */
 			window.display();
 
-			//special casses to go to the loop in a game end event & end the game if the player has busted or blackjacked
+			//Go to the main loop if the current game is over
 			if (gameEnd) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(2500));
 				goto LOOP;
 			}
+
+			//Go to the GAME_END identifier if the player has busted or blackjacked
 			if (bst || blj) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 				goto GAME_END;
@@ -530,85 +588,119 @@ int main() {
 
 	SPECTATE:
 
-	sf::RenderWindow window(sf::VideoMode(770, 400), "Blackjack");
+	while (true) {
 
-	while (window.isOpen()) {
+		//Drawing window
+		sf::RenderWindow window(sf::VideoMode(770, 400), "Blackjack");
 
+	//Spectate loop goto var
+	SLOOP:
+
+		//Log info
+		cout << "[INFO]Entering Spectate Loop" << endl;
+
+		//Card counters
+		int scounter = 3; 
+		int ncounter = 3;
+
+		//Game status
+		bool gameEnd = false;
+
+		//Local deck
 		Deck deck = Deck();
 
+		//Constructing the AI objects
+		noah = AI(deck.draw(), deck.draw());
+		salem = AI(deck.draw(), deck.draw());
+
+		//Noah's 1st card (preloaded)
 		sf::Texture nc1;
-		nc1.loadFromFile(deck.draw().getFileName());
+		nc1.loadFromFile(noah.h.hand[0].getFileName());
 		sf::Sprite noahCard1;
 		noahCard1.setTexture(nc1);
 		noahCard1.scale(.2, .2);
 		noahCard1.setPosition(sf::Vector2f(15, 35));
 
+		//Noah's 2nd card (preloaded)
 		sf::Texture nc2;
-		nc2.loadFromFile(deck.draw().getFileName());
+		nc2.loadFromFile(noah.h.hand[1].getFileName());
 		sf::Sprite noahCard2;
 		noahCard2.setTexture(nc2);
 		noahCard2.scale(.2, .2);
 		noahCard2.setPosition(sf::Vector2f(125, 35));
 
-		sf::Texture nc3;
+		//Unloaded sprites
 		sf::Sprite noahCard3;
-		noahCard3.setTexture(nc3);
+		sf::Sprite noahCard4;
+		sf::Sprite noahCard5;
+
+
+		//Noah's unloaded card sprites & textures
+		sf::Texture nc3;
 		noahCard3.scale(.2, .2);
-		noahCard3.setPosition(sf::Vector2f(335, 35));
+		noahCard3.setPosition(sf::Vector2f(235, 35));
 
 		sf::Texture nc4;
-		sf::Sprite noahCard4;
-		noahCard4.setTexture(nc4);
 		noahCard4.scale(.2, .2);
-		noahCard4.setPosition(sf::Vector2f(445, 35));
+		noahCard4.setPosition(sf::Vector2f(345, 35));
 
 		sf::Texture nc5;
-		sf::Sprite noahCard5;
-		noahCard5.setTexture(nc5);
 		noahCard5.scale(.2, .2);
-		noahCard5.setPosition(sf::Vector2f(555, 35));
+		noahCard5.setPosition(sf::Vector2f(455, 35));
 
+		//Salem's 1st card (preloaded)
 		sf::Texture sc1;
-		sc1.loadFromFile(deck.draw().getFileName());
+		sc1.loadFromFile(salem.h.hand[0].getFileName());
 		sf::Sprite salemCard1;
 		salemCard1.setTexture(sc1);
 		salemCard1.scale(.2, .2);
 		salemCard1.setPosition(sf::Vector2f(15, 225));
 
+		//Salem's 2nd card (preloaded)
 		sf::Texture sc2;
-		sc2.loadFromFile(deck.draw().getFileName());
+		sc2.loadFromFile(salem.h.hand[1].getFileName());
 		sf::Sprite salemCard2;
 		salemCard2.setTexture(sc2);
 		salemCard2.scale(.2, .2);
 		salemCard2.setPosition(sf::Vector2f(125, 225));
 
-		sf::Texture sc3;
+
+		//Salem's unloaded card sprites
 		sf::Sprite salemCard3;
-		salemCard3.setTexture(sc3);
+		sf::Sprite salemCard4;
+		sf::Sprite salemCard5;
+
+		//Unloaded card textures & sprites
+		sf::Texture sc3;
 		salemCard3.scale(.2, .2);
 		salemCard3.setPosition(sf::Vector2f(235, 225));
 
 		sf::Texture sc4;
-		sf::Sprite salemCard4;
-		salemCard3.setTexture(sc4);
-		salemCard3.scale(.2, .2);
-		salemCard3.setPosition(sf::Vector2f(235, 225));
+		salemCard4.scale(.2, .2);
+		salemCard4.setPosition(sf::Vector2f(345, 225));
 
 		sf::Texture sc5;
-		sf::Sprite salemCard5;
-		salemCard3.setTexture(sc5);
-		salemCard3.scale(.2, .2);
-		salemCard3.setPosition(sf::Vector2f(235, 225));
+		salemCard5.scale(.2, .2);
+		salemCard5.setPosition(sf::Vector2f(455, 225));
 
-		while (true) {
 
+		//Main game loop
+		while (window.isOpen()) {
+
+			//Win vars
 			bool noahWin = false;
 			bool salemWin = false;
 			bool houseWin = false;
 
+			//Only let AI hit once per iteration
+			bool nhitthisit = false;
+			bool shitthisit = false;
+
+			//Font
 			sf::Font font;
 			font.loadFromFile("AdobeGothicStd-Bold.otf");
 
+			//Home button text
 			sf::Text home;
 			home.setFont(font);
 			home.setString("Home");
@@ -616,38 +708,44 @@ int main() {
 			home.setFillColor(sf::Color::Black);
 			home.setPosition(sf::Vector2f(660, 20));
 
+			//Home box
 			sf::RectangleShape homeBox(sf::Vector2f(135, 35));
 			homeBox.setFillColor(sf::Color::Color(255, 51, 51));
 			homeBox.setOutlineColor(sf::Color::Black);
 			homeBox.setOutlineThickness(1);
 			homeBox.setPosition(sf::Vector2f(620, 15));
 
+			//Switching font for readability
 			font.loadFromFile("impact.ttf");
 
-			sf::Text noah;
+			//Noah score text
+			sf::Text noaht;
 			std::string nsc{ "Noah's Score: " };
 			nsc.append(std::to_string(noahScore));
-			noah.setFont(font);
-			noah.setFillColor(sf::Color::Color(96, 96, 96));
-			noah.setString(nsc);
-			noah.setCharacterSize(18);
-			noah.setPosition(sf::Vector2f(15, 5));
+			noaht.setFont(font);
+			noaht.setFillColor(sf::Color::Color(128, 128, 128));
+			noaht.setString(nsc);
+			noaht.setCharacterSize(18);
+			noaht.setPosition(sf::Vector2f(15, 5));
 
-			sf::Text salem;
+			//Salem score text
+			sf::Text salemt;
 			std::string ssc{ "Salem's Score: " };
 			ssc.append(std::to_string(salemScore));
-			salem.setFont(font);
-			salem.setFillColor(sf::Color::Color(96, 96, 96));
-			salem.setString(ssc);
-			salem.setCharacterSize(18);
-			salem.setPosition(sf::Vector2f(15, 190));
+			salemt.setFont(font);
+			salemt.setFillColor(sf::Color::Color(128, 128, 128));
+			salemt.setString(ssc);
+			salemt.setCharacterSize(18);
+			salemt.setPosition(sf::Vector2f(15, 190));
 			
+			//Win box
 			sf::RectangleShape winBox(sf::Vector2f(175, 135));
 			winBox.setFillColor(sf::Color::Color(255, 128, 0));
 			winBox.setOutlineColor(sf::Color::Black);
 			winBox.setOutlineThickness(1);
 			winBox.setPosition(sf::Vector2f(580, 250));
 
+			//Salem win text
 			sf::Text sWin;
 			sWin.setFont(font);
 			sWin.setString("Salem wins...\nNew Game");
@@ -655,6 +753,7 @@ int main() {
 			sWin.setCharacterSize(18);
 			sWin.setPosition(sf::Vector2f(620, 290));
 
+			//Noah win text
 			sf::Text nWin;
 			nWin.setFont(font);
 			nWin.setString("Noah wins...\nNew Game");
@@ -662,18 +761,64 @@ int main() {
 			nWin.setCharacterSize(18);
 			nWin.setPosition(sf::Vector2f(620, 290));
 
+			//House win text
+			sf::Text hWin;
+			hWin.setFont(font);
+			hWin.setString("House wins...\nNew Game");
+			hWin.setFillColor(sf::Color::Black);
+			hWin.setCharacterSize(18);
+			hWin.setPosition(sf::Vector2f(620, 290));
+
+			//Background sprite
 			sf::Texture bg;
 			bg.loadFromFile("Background.jpg");
 			sf::Sprite background;
 			background.setTexture(bg);
 
+			//Local event list
 			sf::Event event;
+
+			//Iterate through and check for events
 			while (window.pollEvent(event)) {
+
+				//Window closed event
 				if (event.type == sf::Event::Closed)
 					return 0;
+
+				//Home button pressed event
+				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.x >= 620 && event.mouseButton.x <= 755 && event.mouseButton.y >= 15 && event.mouseButton.y <= 50) {
+					cout << "[INFO]Home button pressed" << endl;
+					goto HOME;
+				}
 			}
 
+		//Goto identifier when the AI hits and sprites need to be re-loaded
+		SN:
+
+			//Noah's current hand value text
+			sf::Text noahHand;
+			std::string nhv{ "Noah's Hand Value: " };
+			nhv.append(std::to_string(noah.h.getValue()));
+			noahHand.setFont(font);
+			noahHand.setFillColor(sf::Color::Color(128, 128, 128));
+			noahHand.setString(nhv);
+			noahHand.setCharacterSize(18);
+			noahHand.setPosition(sf::Vector2f(235, 5));
+
+			//Salem's current hand value text
+			sf::Text salemHand;
+			std::string shv{ "Salem's Hand Value: " };
+			shv.append(std::to_string(salem.h.getValue()));
+			salemHand.setFont(font);
+			salemHand.setFillColor(sf::Color::Color(128, 128, 128));
+			salemHand.setString(shv);
+			salemHand.setCharacterSize(18);
+			salemHand.setPosition(sf::Vector2f(235, 190));
+
+			//Clear all entities
 			window.clear(sf::Color::Color(192, 192, 192));
+
+			//Draw all entities
 			window.draw(background);
 			window.draw(noahCard1);
 			window.draw(noahCard2);
@@ -687,16 +832,179 @@ int main() {
 			window.draw(salemCard5);
 			window.draw(homeBox);
 			window.draw(home);
-			window.draw(noah);
-			window.draw(salem);
+			window.draw(noaht);
+			window.draw(salemt);
+			window.draw(noahHand);
+			window.draw(salemHand);
 			window.draw(winBox);
-			if (salemWin)
+			
+			//Special win cases
+			if (salemWin) {
+				salemWin = false;
 				window.draw(sWin);
-			if (noahWin)
+				cout << "[INFO]Salem Wins" << endl;
+			}
+			if (noahWin) {
+				noahWin = false;
 				window.draw(nWin);
+				cout << "[INFO]Noah Wins" << endl;
+			}
+			if (houseWin) {
+				houseWin = false;
+				window.draw(hWin);
+				cout << "[INFO]Salem Wins" << endl;
+			}
+
+			//Display all to the local window
 			window.display();
+
+			//If the game is over, wait 2.5 seconds and return to the top 
+			if (gameEnd) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+				goto SLOOP;
+			}
+
+			//Noah's AI determination to hit or not
+			if (noah.hit() && !noah.bust() && !nhitthisit) {
+
+				//Noah has hit this iteration
+				nhitthisit = true;
+
+				cout << "[INFO]Noah hits" << endl;
+				cout << "[INFO]Ncounter = " << ncounter << endl;
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
+				noah.addCard(deck.draw());
+
+				//Load noah card 3
+				if (ncounter == 3) {
+					nc3.loadFromFile(noah.h.hand[2].getFileName());
+
+					//Log noah card 3
+					cout << noah.h.hand[2].getFileName() << endl;
+					noahCard3.setTexture(nc3);
+				}
+
+				//Load noah card 4
+				if (ncounter == 4) {
+					nc4.loadFromFile(noah.h.hand[3].getFileName());
+
+					//Log noah card 4
+					cout << noah.h.hand[3].getFileName() << endl;
+					noahCard4.setTexture(nc4);
+				}
+
+				//Load noah card 5
+				if (ncounter == 5) {
+					nc5.loadFromFile(noah.h.hand[4].getFileName());
+
+					//Log noah card 5
+					cout << noah.h.hand[4].getFileName() << endl;
+					noahCard5.setTexture(nc5);
+				}
+				
+				//Incr. noah counter
+				ncounter++;
+				goto SN;
+			}
+
+			//Salem's AI determination to hit or not
+			if (salem.hit() && !salem.bust() && !shitthisit) {
+
+				//Salem has hit this iteration
+				shitthisit = true;
+
+				cout << "[INFO]Salem hits" << endl;
+				cout << "[INFO]SCounter = " << scounter << endl;
+
+				std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+
+				//Load salem card 3
+				salem.addCard(deck.draw());
+				if (scounter == 3) {
+					sc3.loadFromFile(salem.h.hand[2].getFileName());
+
+					//Log salem card 3
+					cout << salem.h.hand[2].getFileName() << endl;
+					salemCard3.setTexture(sc3);
+				}
+
+				//Load salem card 4
+				if (scounter == 4) {
+					sc4.loadFromFile(salem.h.hand[3].getFileName());
+
+					//Log salem card 4
+					cout << salem.h.hand[3].getFileName() << endl;
+					salemCard4.setTexture(sc4);
+				}
+
+				//Load salem card 5
+				if (scounter == 5) {
+					sc5.loadFromFile(salem.h.hand[4].getFileName());
+
+					//Log salem card 5
+					cout << salem.h.hand[4].getFileName() << endl;
+					salemCard5.setTexture(sc5);
+				}
+
+				//Incr. salem counter
+				scounter++;
+				goto SN;
+			}
+
+			//If neither AI wants to hit, enter the game end statements to calc winner
+			if (!salem.hit() && !noah.hit()) {
+				gameEnd = true;
+
+				//If noah busts and salem does not, salem wins
+				if (!salem.bust() && noah.bust()) {
+					salemWin = true;
+					salemScore++;
+					goto SN;
+				}
+
+				//If salem busts and noah does not, noah wins
+				if (!noah.bust() && salem.bust()) {
+					noahWin = true;
+					salemScore++;
+					goto SN;
+				}
+
+				//If both salem and noah bust, calc the higher value
+				if (!salem.bust() && !noah.bust()) {
+
+					//salem > noah, salem wins
+					if (salem.h.getValue() > noah.h.getValue()) {
+						salemWin = true;
+						salemScore++;
+						goto SN;
+					}
+
+					//noah > salem, noah wins
+					if (noah.h.getValue() > salem.h.getValue()) {
+						noahWin = true;
+						noahScore++;
+						goto SN;
+					}
+
+					//salem = noah, house wins
+					if (noah.h.getValue() == salem.h.getValue()) {
+						houseWin = true;
+						goto SN;
+					}
+				}
+
+				//by default the house wins (if both players bust)
+				houseWin = true;
+				goto SN;
+			}
+
+			//Log info
+			cout << "[INFO]Iteration Complete" << endl;
 		}
 	}
 
+//End it all
 return 0;
 }

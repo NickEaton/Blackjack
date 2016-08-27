@@ -1,6 +1,21 @@
 ﻿  Main.cpp
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(158): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(166): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(351): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(355): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(359): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(553): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(560): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(568): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(572): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(576): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(583): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(590): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(598): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(602): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\main.cpp(606): warning C4305: 'argument': truncation from 'double' to 'float'
   Card.cpp
-c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\card.cpp(78): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\nicke\documents\visual studio 2015\projects\blackjack\blackjack\card.cpp(87): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
   AI.cpp
   Generating Code...
   Blackjack.vcxproj -> C:\Users\nicke\documents\visual studio 2015\Projects\Blackjack\Debug\Blackjack.exe
