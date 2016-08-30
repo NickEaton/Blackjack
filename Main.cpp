@@ -967,7 +967,7 @@ int main() {
 				//If salem busts and noah does not, noah wins
 				if (!noah.bust() && salem.bust()) {
 					noahWin = true;
-					salemScore++;
+					noahScore++;
 					goto SN;
 				}
 
